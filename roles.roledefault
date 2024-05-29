@@ -1,0 +1,33 @@
+[
+	{
+		"Name": "any",
+		"Description": "any users",
+		"defaultPrivilege": {
+			"IsSimple": false,
+			"SimplePrivilege": 3,
+			"IndividualPrivilege": {
+				"READ": true,
+				"CREATE": true,
+				"UPDATE": true,
+				"DELETE": true,
+				"ALL": true
+			}
+		}
+	},
+	{
+		"Name": "authenticated-user",
+		"Description": "authenticated users",
+		"defaultPrivilege": {
+			"IsSimple": true,
+			"SimplePrivilege": 2
+		}
+	},
+	{
+		"Name": "system-user",
+		"Description": "any users",
+		"defaultPrivilege": {
+			"IsSimple": true,
+			"SimplePrivilege": 2
+		}
+	}
+]
