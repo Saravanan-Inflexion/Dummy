@@ -1,0 +1,677 @@
+2024-05-29T19:12:20.447Z [info] 
+==========LLM call for step "extractAppSkeleton":==========
+You help the user building a Fiori Elements application described in the user input.
+
+The application typically starts with a ListReport page showing the data of the base entity of the application in a table.
+Details of a specific table row are shown in the ObjectPage. This first ObjectPage is therefore based on the base entity of the application.
+An ObjectPage can contain one or more table sections based on to-many associations of its entity type.
+The details of a table section row can be shown in an another ObjectPage based on the associations target entity.
+
+Your task is to find the entities (with their associations) as well as the ObjectPages (with the associations they use in table sections) described in the user input below.
+
+You must format your output as a JSON value that adheres to a given "JSON Schema" instance.
+
+"JSON Schema" is a declarative language that allows you to annotate and validate JSON documents.
+
+For example, the example "JSON Schema" instance {{"properties": {{"foo": {{"description": "a list of test words", "type": "array", "items": {{"type": "string"}}}}}}, "required": ["foo"]}}
+would match an object with one required property, "foo". The "type" property specifies "foo" must be an "array", and the "description" property semantically describes it as "a list of test words". The items within "foo" must be strings.
+Thus, the object {{"foo": ["bar", "baz"]}} is a well-formatted instance of this example "JSON Schema". The object {{"properties": {{"foo": ["bar", "baz"]}}}} is not well-formatted.
+
+Your output will be parsed and type-checked according to the provided schema instance, so make sure all fields in your output match the schema exactly and there are no trailing commas!
+
+Here is the JSON Schema instance your output must adhere to. Include the enclosing markdown codeblock:
+```json
+{
+  "type": "object",
+  "properties": {
+    "entities": {
+      "type": "array",
+      "description": "Define all entities and their associations; entity properties will be determined later",
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "UpperCamelCase, no spaces, plural, e.g. 'Orders'"
+          },
+          "label": {
+            "type": "string",
+            "description": "max two words, singular"
+          },
+          "associations": {
+            "type": "array",
+            "description": "Define all associations between entities",
+            "items": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string"
+                },
+                "target": {
+                  "type": "string",
+                  "description": "Points to existing entity, value is entities.name"
+                },
+                "multiplicity": {
+                  "type": "string",
+                  "enum": [
+                    "one",
+                    "many"
+                  ]
+                }
+              },
+              "required": [
+                "name",
+                "target",
+                "multiplicity"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "labelPlural": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "name",
+          "label",
+          "associations",
+          "labelPlural"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "baseEntity": {
+      "type": "string",
+      "description": "base entity of ListReport page (if present) and first ObjectPage"
+    },
+    "noListReportPage": {
+      "type": "boolean",
+      "description": "true: no ListReport page will generated, e.g. for applications which start with an (input enabled) Object Page to enter data"
+    },
+    "objectPages": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "entityType": {
+            "type": "string",
+            "description": "Entity that the ObjectPage is based on, the first ObjectPage is always based on base entity"
+          },
+          "tableSectionsAssociations": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "to-many associations of page entity for table sections shown in the ObjectPage"
+          }
+        },
+        "required": [
+          "entityType"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "namespace": {
+      "type": "string",
+      "description": "lowerCamelCase, no spaces allowed"
+    },
+    "applicationName": {
+      "type": "string",
+      "description": "lowerCamelCase, no spaces allowed"
+    }
+  },
+  "required": [
+    "entities",
+    "baseEntity",
+    "objectPages",
+    "namespace",
+    "applicationName"
+  ],
+  "additionalProperties": false
+}
+```
+
+Output ONLY the json contents and try to be as accurate as comprehensive as possible.
+
+<UserInput>
+Develop a UI5 freestyle application for HR service delivery integrated with SAP SuccessFactors. The application will provide self-service capabilities for employees and efficient ticket management for HR business partners. It will include features to manage service-level agreements (SLAs), enhance communication, and generate analytical reports. Features: Self-Service Portal for Employees: Create and review the status of tickets. Check the knowledge base for similar issues before creating a new ticket. Automatically convert emails to tickets. HR Business Partner Interface: Claim and review tickets from the queue. Respond to tickets and update their status. Add selected resolutions to the knowledge base. Analytical Reports: Ticket Status and Summary with filters. Ticket Turn Around Time with Responders.
+</UserInput>
+
+----------Response:----------
+{
+  "entities": [
+    {
+      "name": "Ticket",
+      "label": "Ticket",
+      "associations": [
+        {
+          "name": "employee",
+          "target": "Employee",
+          "multiplicity": "one"
+        },
+        {
+          "name": "hrBusinessPartner",
+          "target": "HRBusinessPartner",
+          "multiplicity": "one"
+        },
+        {
+          "name": "knowledgeBase",
+          "target": "KnowledgeBase",
+          "multiplicity": "many"
+        },
+        {
+          "name": "responder",
+          "target": "Responder",
+          "multiplicity": "many"
+        }
+      ],
+      "labelPlural": "Tickets"
+    },
+    {
+      "name": "Employee",
+      "label": "Employee",
+      "associations": [],
+      "labelPlural": "Employees"
+    },
+    {
+      "name": "HRBusinessPartner",
+      "label": "HR Business Partner",
+      "associations": [],
+      "labelPlural": "HR Business Partners"
+    },
+    {
+      "name": "KnowledgeBase",
+      "label": "Knowledge Base",
+      "associations": [],
+      "labelPlural": "Knowledge Bases"
+    },
+    {
+      "name": "Responder",
+      "label": "Responder",
+      "associations": [],
+      "labelPlural": "Responders"
+    }
+  ],
+  "baseEntity": "Ticket",
+  "noListReportPage": false,
+  "objectPages": [
+    {
+      "entityType": "Ticket",
+      "tableSectionsAssociations": [
+        "knowledgeBase",
+        "responder"
+      ]
+    }
+  ],
+  "namespace": "hrServiceDelivery",
+  "applicationName": "HRServiceDelivery"
+}
+2024-05-29T19:12:20.455Z [info] Step "switchBasedOnAppSkeleton": case 0 blocked! Evaluation details:
+ - JSONPath "$.model.applications[0].pages[0]" : [{"type":"ListReport","entityType":"Ticket"}]
+2024-05-29T19:12:20.455Z [info] Step "switchBasedOnAppSkeleton": case 1 blocked! Evaluation details:
+ - JSONPath "$.model.applications[0].pages[0].type" : ["ListReport"]
+2024-05-29T19:12:20.455Z [info] Step "switchBasedOnAppSkeleton": no condition met - running default steps
+2024-05-29T19:12:42.955Z [info] 
+==========LLM call for step "extractEntitiesProperties":==========
+You help the user refining the DataModel for a Fiori Elements application described in the user input.
+
+The DataModel consists of the following entities and associations:
+- entity "Ticket" (with to-many associations to "KnowledgeBase" and "Responder" and to-one association to "Employee" and "HRBusinessPartner")
+- entity "Employee"
+- entity "HRBusinessPartner"
+- entity "KnowledgeBase" (with to-one association to "Ticket")
+- entity "Responder" (with to-one association to "Ticket")
+
+Your task is to find the properties for each entity.
+You must format your output as a JSON value that adheres to a given "JSON Schema" instance.
+
+"JSON Schema" is a declarative language that allows you to annotate and validate JSON documents.
+
+For example, the example "JSON Schema" instance {{"properties": {{"foo": {{"description": "a list of test words", "type": "array", "items": {{"type": "string"}}}}}}, "required": ["foo"]}}
+would match an object with one required property, "foo". The "type" property specifies "foo" must be an "array", and the "description" property semantically describes it as "a list of test words". The items within "foo" must be strings.
+Thus, the object {{"foo": ["bar", "baz"]}} is a well-formatted instance of this example "JSON Schema". The object {{"properties": {{"foo": ["bar", "baz"]}}}} is not well-formatted.
+
+Your output will be parsed and type-checked according to the provided schema instance, so make sure all fields in your output match the schema exactly and there are no trailing commas!
+
+Here is the JSON Schema instance your output must adhere to. Include the enclosing markdown codeblock:
+```json
+{
+  "type": "object",
+  "properties": {
+    "elements": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "entityName": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string",
+            "description": "camelCase, no spaces"
+          },
+          "type": {
+            "type": "string",
+            "description": "Allowed values: String(50), Boolean, Integer, Decimal, Double, Date, Time, DateTime, Timestamp; String length can vary - i.e. String(20)"
+          },
+          "key": {
+            "type": "boolean",
+            "description": "max. one optional key per entity, only if this element is a semantic key and can uniquely identify the instance"
+          },
+          "essentialElement": {
+            "type": "boolean",
+            "description": "'true' only if element is marked as essential'"
+          },
+          "additionalInfo": {
+            "type": "string",
+            "description": "All additional information from user input, e.g. user description, example values; also consider referenced parts in the user input"
+          }
+        },
+        "required": [
+          "entityName",
+          "name",
+          "type",
+          "additionalInfo"
+        ],
+        "additionalProperties": false
+      },
+      "description": "At least 5 realistic elements (unless explicitly specified)"
+    }
+  },
+  "required": [
+    "elements"
+  ],
+  "additionalProperties": false
+}
+```
+
+Output ONLY the json contents and try to be as accurate as comprehensive as possible.
+
+<UserInput>
+Develop a UI5 freestyle application for HR service delivery integrated with SAP SuccessFactors. The application will provide self-service capabilities for employees and efficient ticket management for HR business partners. It will include features to manage service-level agreements (SLAs), enhance communication, and generate analytical reports. Features: Self-Service Portal for Employees: Create and review the status of tickets. Check the knowledge base for similar issues before creating a new ticket. Automatically convert emails to tickets. HR Business Partner Interface: Claim and review tickets from the queue. Respond to tickets and update their status. Add selected resolutions to the knowledge base. Analytical Reports: Ticket Status and Summary with filters. Ticket Turn Around Time with Responders.
+</UserInput>
+
+----------Response:----------
+{
+  "elements": [
+    {
+      "entityName": "Ticket",
+      "name": "id",
+      "type": "String(50)",
+      "key": true,
+      "essentialElement": true,
+      "additionalInfo": "Unique identifier for the ticket"
+    },
+    {
+      "entityName": "Ticket",
+      "name": "title",
+      "type": "String(50)",
+      "essentialElement": true,
+      "additionalInfo": "Title of the ticket"
+    },
+    {
+      "entityName": "Ticket",
+      "name": "description",
+      "type": "String",
+      "essentialElement": true,
+      "additionalInfo": "Description of the ticket"
+    },
+    {
+      "entityName": "Ticket",
+      "name": "status",
+      "type": "String(50)",
+      "essentialElement": true,
+      "additionalInfo": "Status of the ticket"
+    },
+    {
+      "entityName": "Ticket",
+      "name": "priority",
+      "type": "String(50)",
+      "essentialElement": true,
+      "additionalInfo": "Priority of the ticket"
+    },
+    {
+      "entityName": "Ticket",
+      "name": "knowledgeBase",
+      "type": "KnowledgeBase[]",
+      "additionalInfo": "List of knowledge base articles related to the ticket"
+    },
+    {
+      "entityName": "Ticket",
+      "name": "responder",
+      "type": "Responder",
+      "additionalInfo": "Responder assigned to the ticket"
+    },
+    {
+      "entityName": "Ticket",
+      "name": "employee",
+      "type": "Employee",
+      "additionalInfo": "Employee who created the ticket"
+    },
+    {
+      "entityName": "Ticket",
+      "name": "hrBusinessPartner",
+      "type": "HRBusinessPartner",
+      "additionalInfo": "HR business partner assigned to the ticket"
+    },
+    {
+      "entityName": "Employee",
+      "name": "id",
+      "type": "String(50)",
+      "key": true,
+      "essentialElement": true,
+      "additionalInfo": "Unique identifier for the employee"
+    },
+    {
+      "entityName": "Employee",
+      "name": "name",
+      "type": "String(50)",
+      "essentialElement": true,
+      "additionalInfo": "Name of the employee"
+    },
+    {
+      "entityName": "HRBusinessPartner",
+      "name": "id",
+      "type": "String(50)",
+      "key": true,
+      "essentialElement": true,
+      "additionalInfo": "Unique identifier for the HR business partner"
+    },
+    {
+      "entityName": "HRBusinessPartner",
+      "name": "name",
+      "type": "String(50)",
+      "essentialElement": true,
+      "additionalInfo": "Name of the HR business partner"
+    },
+    {
+      "entityName": "KnowledgeBase",
+      "name": "id",
+      "type": "String(50)",
+      "key": true,
+      "essentialElement": true,
+      "additionalInfo": "Unique identifier for the knowledge base article"
+    },
+    {
+      "entityName": "KnowledgeBase",
+      "name": "title",
+      "type": "String(50)",
+      "essentialElement": true,
+      "additionalInfo": "Title of the knowledge base article"
+    },
+    {
+      "entityName": "Responder",
+      "name": "id",
+      "type": "String(50)",
+      "key": true,
+      "essentialElement": true,
+      "additionalInfo": "Unique identifier for the responder"
+    },
+    {
+      "entityName": "Responder",
+      "name": "name",
+      "type": "String(50)",
+      "essentialElement": true,
+      "additionalInfo": "Name of the responder"
+    }
+  ]
+}
+2024-05-29T19:12:56.165Z [info] 
+==========LLM call for step "extractPropertyDetails":==========
+Here is a list of properties with name and description:
+
+Ticket_ticketID: Unique identifier for the ticket
+Ticket_title: Title of the ticket
+Ticket_description: Description of the ticket
+Ticket_status: Status of the ticket
+Ticket_priority: Priority of the ticket
+Employee_employeeID: Unique identifier for the employee
+Employee_name: Name of the employee
+HRBusinessPartner_hRBusinessPartnerID: Unique identifier for the HR business partner
+HRBusinessPartner_name: Name of the HR business partner
+KnowledgeBase_knowledgeBaseID: Unique identifier for the knowledge base article
+KnowledgeBase_title: Title of the knowledge base article
+Responder_responderID: Unique identifier for the responder
+Responder_name: Name of the responder
+
+For each property analyze the description.
+
+You must format your output as a JSON value that adheres to a given "JSON Schema" instance.
+
+"JSON Schema" is a declarative language that allows you to annotate and validate JSON documents.
+
+For example, the example "JSON Schema" instance {{"properties": {{"foo": {{"description": "a list of test words", "type": "array", "items": {{"type": "string"}}}}}}, "required": ["foo"]}}
+would match an object with one required property, "foo". The "type" property specifies "foo" must be an "array", and the "description" property semantically describes it as "a list of test words". The items within "foo" must be strings.
+Thus, the object {{"foo": ["bar", "baz"]}} is a well-formatted instance of this example "JSON Schema". The object {{"properties": {{"foo": ["bar", "baz"]}}}} is not well-formatted.
+
+Your output will be parsed and type-checked according to the provided schema instance, so make sure all fields in your output match the schema exactly and there are no trailing commas!
+
+Here is the JSON Schema instance your output must adhere to. Include the enclosing markdown codeblock:
+```json
+{
+  "type": "object",
+  "properties": {
+    "properties": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "values": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "All values mentioned in the description. Those could be possible values or example values. Don't make up or invent any values"
+          },
+          "hasFixedValuesList": {
+            "type": "boolean",
+            "description": "Only limited list of values expected, e.g. elements representing types, statuses, categories, units, organizations"
+          }
+        },
+        "required": [
+          "name"
+        ],
+        "additionalProperties": false
+      }
+    }
+  },
+  "required": [
+    "properties"
+  ],
+  "additionalProperties": false
+}
+```
+
+Output ONLY the json contents and try to be as accurate as comprehensive as possible.
+
+----------Response:----------
+```json
+{
+  "properties": [
+    {
+      "name": "Ticket_ticketID",
+      "values": [],
+      "hasFixedValuesList": false
+    },
+    {
+      "name": "Ticket_title",
+      "values": [],
+      "hasFixedValuesList": false
+    },
+    {
+      "name": "Ticket_description",
+      "values": [],
+      "hasFixedValuesList": false
+    },
+    {
+      "name": "Ticket_status",
+      "values": [],
+      "hasFixedValuesList": false
+    },
+    {
+      "name": "Ticket_priority",
+      "values": [],
+      "hasFixedValuesList": false
+    },
+    {
+      "name": "Employee_employeeID",
+      "values": [],
+      "hasFixedValuesList": false
+    },
+    {
+      "name": "Employee_name",
+      "values": [],
+      "hasFixedValuesList": false
+    },
+    {
+      "name": "HRBusinessPartner_hRBusinessPartnerID",
+      "values": [],
+      "hasFixedValuesList": false
+    },
+    {
+      "name": "HRBusinessPartner_name",
+      "values": [],
+      "hasFixedValuesList": false
+    },
+    {
+      "name": "KnowledgeBase_knowledgeBaseID",
+      "values": [],
+      "hasFixedValuesList": false
+    },
+    {
+      "name": "KnowledgeBase_title",
+      "values": [],
+      "hasFixedValuesList": false
+    },
+    {
+      "name": "Responder_responderID",
+      "values": [],
+      "hasFixedValuesList": false
+    },
+    {
+      "name": "Responder_name",
+      "values": [],
+      "hasFixedValuesList": false
+    }
+  ]
+}
+```
+2024-05-29T19:12:56.166Z [info] Step "switchSimpleOrComplexApp": case 0 blocked! Evaluation details:
+ - JSONPath "$.model.applications[0].pages[2]" : []
+ - JSONPath "$.userInput.lineCount" : [11]
+2024-05-29T19:12:56.166Z [info] Step "switchSimpleOrComplexApp": no condition met - running default steps
+2024-05-29T19:12:56.166Z [info] Step "runFlowForComplexApp": workflow "givenSkeletonExtractComplexApp" started
+"
+2024-05-29T19:13:02.030Z [info] 
+==========LLM call for classifier:==========
+The user input below describes a Fiori Elements application with a ListReport page and multiple ObjectPages.
+ListReport page shows the data of the specific business object as a list or table. ObjectPage shows details of a specific business object instance.
+Your task is to classify the lines based on the same business object representation to the following categories, one line can refer only to a single category:
+ - LIST_REPORT_TICKET: line describes the ListReport page for "Ticket"
+ - OBJECT_PAGE_TICKET: line describes the ObjectPage for "Ticket" with a table of "KnowledgeBase" and a table of "Responder"
+ - NONE: line is not describing any ListReport page or ObjectPage
+
+Return your findings as csv file with columns "lineContent" and "category"!
+
+<UserInput>
+Develop a UI5 freestyle application for HR service delivery integrated with SAP SuccessFactors.
+The application will provide self-service capabilities for employees and efficient ticket management for HR business partners.
+It will include features to manage service-level agreements (SLAs), enhance communication, and generate analytical reports.
+Features: Self-Service Portal for Employees: Create and review the status of tickets.
+Check the knowledge base for similar issues before creating a new ticket.
+Automatically convert emails to tickets.
+HR Business Partner Interface: Claim and review tickets from the queue.
+Respond to tickets and update their status.
+Add selected resolutions to the knowledge base.
+Analytical Reports: Ticket Status and Summary with filters.
+Ticket Turn Around Time with Responders.
+</UserInput>
+
+----------Response:----------
+lineContent,category
+Develop a UI5 freestyle application for HR service delivery integrated with SAP SuccessFactors.,NONE
+The application will provide self-service capabilities for employees and efficient ticket management for HR business partners.,NONE
+It will include features to manage service-level agreements (SLAs), enhance communication, and generate analytical reports.,NONE
+Features: Self-Service Portal for Employees: Create and review the status of tickets.,NONE
+Check the knowledge base for similar issues before creating a new ticket.,NONE
+Automatically convert emails to tickets.,NONE
+HR Business Partner Interface: Claim and review tickets from the queue.,NONE
+Respond to tickets and update their status.,NONE
+Add selected resolutions to the knowledge base.,NONE
+Analytical Reports: Ticket Status and Summary with filters.,NONE
+Ticket Turn Around Time with Responders.,NONE
+2024-05-29T19:13:02.031Z [info] Step "loopOverPages": looping over 2 entries
+"
+2024-05-29T19:13:02.031Z [info] Step "loopOverPages" index 0: pageType=ListReport, entityType=Ticket
+2024-05-29T19:13:02.031Z [info] Step "ifListReportPage": case 0 passed! Evaluation details:
+ - Variable "pageType" : "ListReport"
+2024-05-29T19:13:02.031Z [info] Step "extractListReport" SKIPPED: no user input after filter
+2024-05-29T19:13:02.032Z [info] Step "loopOverPages" index 1: pageType=ObjectPage, entityType=Ticket
+2024-05-29T19:13:02.032Z [info] Step "ifListReportPage": case 0 blocked! Evaluation details:
+ - Variable "pageType" : "ObjectPage"
+2024-05-29T19:13:02.032Z [info] Step "ifListReportPage": no condition met - running default steps
+2024-05-29T19:13:02.032Z [info] Step "extractSingleObjectPageOfMany" SKIPPED: no user input after filter
+2024-05-29T19:13:02.032Z [info] Step "ifCodeListsPresent": case 0 blocked! Evaluation details:
+ - JSONPath "$.model.entities[*].elements[*].values[*]" : []
+2024-05-29T19:13:12.360Z [info] 
+==========LLM call for data generation:==========
+
+For the following list of entities, create data for the empty CSV files.
+Entity "Ticket" - Properties:
+    ticketID: String(50), Unique identifier for the ticket
+    title: String(50), Title of the ticket
+    description: String, Description of the ticket
+    status: String(50), Status of the ticket
+    priority: String(50), Priority of the ticket
+    employee_employeeID: String(50), employeeID of associated Employee
+    hrBusinessPartner_hRBusinessPartnerID: String(50), hRBusinessPartnerID of associated HRBusinessPartner
+
+Entity "Employee" - Properties:
+    employeeID: String(50), Unique identifier for the employee
+    name: String(50), Name of the employee
+
+Entity "HRBusinessPartner" - Properties:
+    hRBusinessPartnerID: String(50), Unique identifier for the HR business partner
+    name: String(50), Name of the HR business partner
+
+Entity "KnowledgeBase" - Properties:
+    knowledgeBaseID: String(50), Unique identifier for the knowledge base article
+    title: String(50), Title of the knowledge base article
+    ticket_ticketID: String(50), ticketID of associated Ticket
+
+Entity "Responder" - Properties:
+    responderID: String(50), Unique identifier for the responder
+    name: String(50), Name of the responder
+    ticket_ticketID: String(50), ticketID of associated Ticket
+
+Empty CSV files in json format (only generate content for these files!):
+{"Ticket.csv":"ticketID;title;description;status;priority;employee_employeeID;hrBusinessPartner_hRBusinessPartnerID","Employee.csv":"employeeID;name","HRBusinessPartner.csv":"hRBusinessPartnerID;name","KnowledgeBase.csv":"knowledgeBaseID;title;ticket_ticketID","Responder.csv":"responderID;name;ticket_ticketID"}
+
+Rules:
+    - Take over the given header line, do not invent new columns!
+    - For a given file, add rows, add '\n' characters before each row but don't break the JSON string
+    - Do not generate rows with same key values, they must be unique!
+    - Make sure that associations match, i.e. a field containing "Name of the associated Customer" must contain an existing Name of entity Customer
+    - Always use ";" as a delimiter in CSV files
+    - The result must be proper JSON format so it can be parsed, don't break JSON strings within, don't add quotes around values.
+    - Create about 5 rows for the first csv, 7 for the second and so on
+    - All values must be realistic with meaningful content, e.g. 'Laptop Screen' and not just placeholder values with incremented numbers like 'Product 1', 'Product 2' etc.
+    
+Use format for values:
+  String(50): string no longer than 50 characters
+    
+
+Example output (Do NOT include in output!):
+```json
+{"Blogs":"blogID;title;description;createdDateTime;views\nBlog1;Tech Blog;A blog about the latest technology trends.;2023-06-27T14:52:23Z;1000\nBlog2;Fashion Blog;Explore the world of fashion and style.;2023-06-27T14:52:23Z;500","Posts":"postID;title;content;publishDate;likes;comments;blogID\n1;The Future of Artificial Intelligence;Artificial intelligence is shaping the future of technology.;2023-06-27;50;10;Blog1
+2;Summer Fashion Trends;Discover the hottest fashion trends for the summer season.;2023-06-27;100;20;Blog2\n3;Must-Have Accessories;10 must-have accessories for the upcoming season;2023-06-27;100;20;Blog2"}
+```
+Output ONLY the json contents for the csv files and try to be as accurate as possible.    
+
+
+
+----------Response:----------
+{"Ticket.csv":"ticketID;title;description;status;priority;employee_employeeID;hrBusinessPartner_hRBusinessPartnerID\nT001;Network Issue;Unable to connect to the internet;Open;High;E001;HRBP001\nT002;Software Error;Application crashing frequently;Open;Medium;E002;HRBP002\nT003;Printer Problem;Unable to print documents;Open;Low;E003;HRBP003\nT004;Email Not Working;Not receiving emails;Open;High;E004;HRBP004\nT005;Server Down;Website not accessible;Open;High;E005;HRBP005","Employee.csv":"employeeID;name\nE001;John Smith\nE002;Emily Johnson\nE003;Michael Brown\nE004;Jessica Davis\nE005;David Wilson\nE006;Sarah Thompson\nE007;Daniel Martinez","HRBusinessPartner.csv":"hRBusinessPartnerID;name\nHRBP001;Alex Johnson\nHRBP002;Jennifer Davis\nHRBP003;Robert Smith\nHRBP004;Emily Wilson\nHRBP005;Michael Johnson\nHRBP006;Jessica Martinez\nHRBP007;David Thompson","KnowledgeBase.csv":"knowledgeBaseID;title;ticket_ticketID\nKB001;How to troubleshoot network issues;T001\nKB002;Fixing common software errors;T002\nKB003;Troubleshooting printer problems;T003\nKB004;Email troubleshooting guide;T004\nKB005;Resolving server downtime issues;T005\nKB006;How to reset password;T001\nKB007;Software installation guide;T002","Responder.csv":"responderID;name;ticket_ticketID\nR001;Sarah Thompson;T001\nR002;Daniel Martinez;T002\nR003;Emily Johnson;T003\nR004;Michael Brown;T004\nR005;Jessica Davis;T005\nR006;David Wilson;T001\nR007;John Smith;T002"}

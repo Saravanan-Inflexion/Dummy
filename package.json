@@ -22,7 +22,7 @@
     "@cap-js/sqlite": "^1",
     "@sap/dev-cap-tools": "^1.31.0",
     "@sap/eslint-plugin-cds": "^3",
-    "@sap/ux-specification": "^1.108.30",
+    "@sap/ux-specification": "^1.120.11",
     "eslint": "^9"
   },
   "scripts": {
@@ -30,7 +30,7 @@
     "start-local": "npm run generate-entry-point && npm run cds-watch",
     "generate-entry-point": "dev-cap-tools gen-entrypoint",
     "cds-watch": "cds watch --open",
-    "watch-user_management.ManageBusinessPartners": "cds watch --open user_management.ManageBusinessPartners/webapp/index.html?sap-ui-xx-viewCache=false"
+    "watch-ui5freestyleapp": "cds watch --open ui5freestyleapp/webapp/index.html?sap-ui-xx-viewCache=false"
   },
   "cds": {
     "requires": {
@@ -76,6 +76,6 @@
   },
   "lcap": true,
   "sapux": [
-    "app/user_management.ManageBusinessPartners"
+    "app/ui5freestyleapp"
   ]
 }

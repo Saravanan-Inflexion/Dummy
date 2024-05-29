@@ -2,9 +2,9 @@
 <html>
 
 <head>
-    <title> Project Preview </title>
+    <title> Application Overview </title>
     <script src="shared-config.js"></script>
-    <script src="https://ui5.sap.com/1.120.13/resources/sap-ui-core.js" 
+    <script src="https://ui5.sap.com/1.108.7/resources/sap-ui-core.js" 
             id="sap-ui-bootstrap"
             data-sap-ui-theme="sap_horizon"
             data-sap-ui-bindingSyntax="complex" 
@@ -28,7 +28,7 @@
                     return Controller.extend("PreviewController", {
                         onInit: function () {
 
-                            const data = {"Services":[{"ServiceName":"hrServiceDeliverySrv","DetailsURL":"./odata/v4/hr-service-delivery-srv/","Metadata":"./odata/v4/hr-service-delivery-srv/$metadata","Entities":[{"Name":"Ticket","URL":"./odata/v4/hr-service-delivery-srv/Ticket","FioriURL":"$fiori-preview/hrServiceDeliverySrv/Ticket#preview-app"},{"Name":"Employee","URL":"./odata/v4/hr-service-delivery-srv/Employee","FioriURL":"$fiori-preview/hrServiceDeliverySrv/Employee#preview-app"},{"Name":"HRBusinessPartner","URL":"./odata/v4/hr-service-delivery-srv/HRBusinessPartner","FioriURL":"$fiori-preview/hrServiceDeliverySrv/HRBusinessPartner#preview-app"},{"Name":"KnowledgeBase","URL":"./odata/v4/hr-service-delivery-srv/KnowledgeBase","FioriURL":"$fiori-preview/hrServiceDeliverySrv/KnowledgeBase#preview-app"},{"Name":"Responder","URL":"./odata/v4/hr-service-delivery-srv/Responder","FioriURL":"$fiori-preview/hrServiceDeliverySrv/Responder#preview-app"}],"EntitiesCount":5}]}
+                            const data = {"Services":[{"ServiceName":"user_managementSrv","DetailsURL":"./service/user_management/","Metadata":"./service/user_management/$metadata","Entities":[{"Name":"A_BusinessPartner","URL":"./service/user_management/A_BusinessPartner","FioriURL":""},{"Name":"A_BusinessPartnerAddress","URL":"./service/user_management/A_BusinessPartnerAddress","FioriURL":""}],"EntitiesCount":2}]}
                             this.getView().setModel(new JSONModel(data));
                         }
                     });

@@ -1,0 +1,259 @@
+{
+    "namespace": "hrServiceDelivery",
+    "entities": [
+        {
+            "name": "Ticket",
+            "label": "Ticket",
+            "associations": [
+                {
+                    "name": "employee",
+                    "target": "Employee",
+                    "multiplicity": "one"
+                },
+                {
+                    "name": "hrBusinessPartner",
+                    "target": "HRBusinessPartner",
+                    "multiplicity": "one"
+                },
+                {
+                    "name": "knowledgeBase",
+                    "target": "KnowledgeBase",
+                    "multiplicity": "many",
+                    "backAssociation": "ticket"
+                },
+                {
+                    "name": "responder",
+                    "target": "Responder",
+                    "multiplicity": "many",
+                    "backAssociation": "ticket"
+                }
+            ],
+            "labelPlural": "Tickets",
+            "elements": [
+                {
+                    "name": "ID",
+                    "type": "UUID",
+                    "key": true,
+                    "label": ""
+                },
+                {
+                    "name": "ticketID",
+                    "type": "String(50)",
+                    "label": "Id",
+                    "additionalInfo": "Unique identifier for the ticket",
+                    "essentialElement": true,
+                    "semanticKey": true,
+                    "values": [],
+                    "hasFixedValuesList": false
+                },
+                {
+                    "name": "title",
+                    "type": "String(50)",
+                    "label": "Title",
+                    "additionalInfo": "Title of the ticket",
+                    "essentialElement": true,
+                    "values": [],
+                    "hasFixedValuesList": false
+                },
+                {
+                    "name": "description",
+                    "type": "String",
+                    "label": "Description",
+                    "additionalInfo": "Description of the ticket",
+                    "essentialElement": true,
+                    "values": [],
+                    "hasFixedValuesList": false
+                },
+                {
+                    "name": "status",
+                    "type": "String(50)",
+                    "label": "Status",
+                    "additionalInfo": "Status of the ticket",
+                    "essentialElement": true,
+                    "values": [],
+                    "hasFixedValuesList": false
+                },
+                {
+                    "name": "priority",
+                    "type": "String(50)",
+                    "label": "Priority",
+                    "additionalInfo": "Priority of the ticket",
+                    "essentialElement": true,
+                    "values": [],
+                    "hasFixedValuesList": false
+                }
+            ]
+        },
+        {
+            "name": "Employee",
+            "label": "Employee",
+            "associations": [],
+            "labelPlural": "Employees",
+            "elements": [
+                {
+                    "name": "ID",
+                    "type": "UUID",
+                    "key": true,
+                    "label": ""
+                },
+                {
+                    "name": "employeeID",
+                    "type": "String(50)",
+                    "label": "Id",
+                    "additionalInfo": "Unique identifier for the employee",
+                    "essentialElement": true,
+                    "semanticKey": true,
+                    "values": [],
+                    "hasFixedValuesList": false
+                },
+                {
+                    "name": "name",
+                    "type": "String(50)",
+                    "label": "Name",
+                    "additionalInfo": "Name of the employee",
+                    "essentialElement": true,
+                    "values": [],
+                    "hasFixedValuesList": false
+                }
+            ]
+        },
+        {
+            "name": "HRBusinessPartner",
+            "label": "HR Business Partner",
+            "associations": [],
+            "labelPlural": "HR Business Partners",
+            "elements": [
+                {
+                    "name": "ID",
+                    "type": "UUID",
+                    "key": true,
+                    "label": ""
+                },
+                {
+                    "name": "hRBusinessPartnerID",
+                    "type": "String(50)",
+                    "label": "Id",
+                    "additionalInfo": "Unique identifier for the HR business partner",
+                    "essentialElement": true,
+                    "semanticKey": true,
+                    "values": [],
+                    "hasFixedValuesList": false
+                },
+                {
+                    "name": "name",
+                    "type": "String(50)",
+                    "label": "Name",
+                    "additionalInfo": "Name of the HR business partner",
+                    "essentialElement": true,
+                    "values": [],
+                    "hasFixedValuesList": false
+                }
+            ]
+        },
+        {
+            "name": "KnowledgeBase",
+            "label": "Knowledge Base",
+            "associations": [
+                {
+                    "name": "ticket",
+                    "target": "Ticket",
+                    "multiplicity": "one",
+                    "selfContained": false
+                }
+            ],
+            "labelPlural": "Knowledge Bases",
+            "elements": [
+                {
+                    "name": "ID",
+                    "type": "UUID",
+                    "key": true,
+                    "label": ""
+                },
+                {
+                    "name": "knowledgeBaseID",
+                    "type": "String(50)",
+                    "label": "Id",
+                    "additionalInfo": "Unique identifier for the knowledge base article",
+                    "essentialElement": true,
+                    "semanticKey": true,
+                    "values": [],
+                    "hasFixedValuesList": false
+                },
+                {
+                    "name": "title",
+                    "type": "String(50)",
+                    "label": "Title",
+                    "additionalInfo": "Title of the knowledge base article",
+                    "essentialElement": true,
+                    "values": [],
+                    "hasFixedValuesList": false
+                }
+            ]
+        },
+        {
+            "name": "Responder",
+            "label": "Responder",
+            "associations": [
+                {
+                    "name": "ticket",
+                    "target": "Ticket",
+                    "multiplicity": "one",
+                    "selfContained": false
+                }
+            ],
+            "labelPlural": "Responders",
+            "elements": [
+                {
+                    "name": "ID",
+                    "type": "UUID",
+                    "key": true,
+                    "label": ""
+                },
+                {
+                    "name": "responderID",
+                    "type": "String(50)",
+                    "label": "Id",
+                    "additionalInfo": "Unique identifier for the responder",
+                    "essentialElement": true,
+                    "semanticKey": true,
+                    "values": [],
+                    "hasFixedValuesList": false
+                },
+                {
+                    "name": "name",
+                    "type": "String(50)",
+                    "label": "Name",
+                    "additionalInfo": "Name of the responder",
+                    "essentialElement": true,
+                    "values": [],
+                    "hasFixedValuesList": false
+                }
+            ]
+        }
+    ],
+    "service": {
+        "name": "hrServiceDeliverySrv",
+        "path": "srv/service.cds"
+    },
+    "applications": [
+        {
+            "pages": [
+                {
+                    "type": "ListReport",
+                    "entityType": "Ticket"
+                },
+                {
+                    "type": "ObjectPage",
+                    "entityType": "Ticket",
+                    "objectPageContent": {
+                        "tableSectionAssociations": [
+                            "knowledgeBase",
+                            "responder"
+                        ]
+                    }
+                }
+            ],
+            "name": "ui5FreestyleApp"
+        }
+    ]
+}

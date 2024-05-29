@@ -1,21 +1,14 @@
-using { BusinessPartnerA2X } from './external/BusinessPartnerA2X.cds';
+using { hrServiceDelivery } from '../db/schema.cds';
 
-using { user_management as my } from '../db/schema.cds';
-
-@path : '/service/user_management'
-service user_managementSrv
-{
-    annotate A_BusinessPartner with @restrict :
-    [
-        { grant : [ '*' ], to : [ 'any' ] }
-    ];
-
-    entity A_BusinessPartner as
-        projection on BusinessPartnerA2X.A_BusinessPartner;
+service hrServiceDeliverySrv {
+  @odata.draft.enabled
+  entity Ticket as projection on hrServiceDelivery.Ticket;
+  @odata.draft.enabled
+  entity Employee as projection on hrServiceDelivery.Employee;
+  @odata.draft.enabled
+  entity HRBusinessPartner as projection on hrServiceDelivery.HRBusinessPartner;
+  @odata.draft.enabled
+  entity KnowledgeBase as projection on hrServiceDelivery.KnowledgeBase;
+  @odata.draft.enabled
+  entity Responder as projection on hrServiceDelivery.Responder;
 }
-
-annotate user_managementSrv with @requires :
-[
-    'authenticated-user',
-    'any'
-];

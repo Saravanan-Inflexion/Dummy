@@ -1,0 +1,5 @@
+{
+  "ProjectOverviewURL": "https://developer-brj3a81b.launchpad.cfapps.us10.hana.ondemand.com/lcapuser_management.user_managementLaunchpad-1.0.0",
+  "DeployedUTCTime": "2024-05-29T10:47:15.251Z",
+  "ApplicationLogURL": "https://logs.cf.us10-001.hana.ondemand.com/app/dashboards#/view/Overview?_g=(filters:!((query:(match_phrase:(component_name:user_management-srv)))))"
+}

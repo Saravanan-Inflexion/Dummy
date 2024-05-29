@@ -1,2 +1,2 @@
 
-using from './user_management.ManageBusinessPartners/annotations';
+using from './ui5freestyleapp/annotations';
