@@ -23,14 +23,19 @@
     "@sap/dev-cap-tools": "^1.31.0",
     "@sap/eslint-plugin-cds": "^3",
     "@sap/ux-specification": "^1.120.11",
-    "eslint": "^9"
+    "eslint": "^9",
+    "rimraf": "^5.0.5"
   },
   "scripts": {
     "start": "cds-serve",
     "start-local": "npm run generate-entry-point && npm run cds-watch",
     "generate-entry-point": "dev-cap-tools gen-entrypoint",
     "cds-watch": "cds watch --open",
-    "watch-ui5freestyleapp": "cds watch --open ui5freestyleapp/webapp/index.html?sap-ui-xx-viewCache=false"
+    "watch-ui5freestyleapp": "cds watch --open ui5freestyleapp/webapp/index.html?sap-ui-xx-viewCache=false",
+    "watch-ui5freestyle": "cds watch --open ui5freestyle/webapp/index.html?sap-ui-xx-viewCache=false",
+    "undeploy": "cf undeploy user_management --delete-services --delete-service-keys --delete-service-brokers",
+    "build": "rimraf resources mta_archives && mbt build --mtar archive",
+    "deploy": "cf deploy mta_archives/archive.mtar --retries 1"
   },
   "cds": {
     "requires": {
@@ -69,6 +74,7 @@
           }
         }
       }
+      
     },
     "features": {
       "fetch_csrf": true
@@ -76,6 +82,7 @@
   },
   "lcap": true,
   "sapux": [
-    "app/ui5freestyleapp"
+    "app/ui5freestyleapp",
+    "app/ui5freestyle"
   ]
 }

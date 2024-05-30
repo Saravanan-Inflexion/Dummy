@@ -1,219 +1,236 @@
-_schema-version: '3.1'
+_schema-version: "3.1"
 ID: user_management
-version: 1.0.0
 description: A simple CAP project.
+version: 1.0.0
+modules:
+- name: user_management-usermanagement.ManageBusinessPartners
+  type: html5
+  path: app/user_management.ManageBusinessPartners
+  build-parameters:
+    _artifactName: usermanagementManageBusinessPartners.zip
+    build-result: dist-zip
+    builder: custom
+    commands:
+    - rm -rf dist-zip dist
+    - npx -p @ui5/cli@^3.0.0 ui5 build --dest dist --include-task=generateManifestBundle
+      --include-task=generateCachebusterInfo
+    - mkdir dist-zip
+    - bash -c "cd dist && npx bestzip ../dist-zip/usermanagementManageBusinessPartners.zip
+      *"
+    supported-platforms: []
+- name: user_management-db-deployer
+  type: hdb
+  path: gen/db
+  requires:
+  - name: user_management-service-uaa
+  - name: user_management-service-db
+  parameters:
+    buildpack: nodejs_buildpack
+  build-parameters:
+    builder: npm
+    ignore:
+    - node_modules
+    - package-lock.json
+- name: user_management-srv
+  type: nodejs
+  path: gen/srv
+  requires:
+  - name: user_management-service-uaa
+  - name: user_management-service-db
+  - name: user_management-service-destination
+  - name: user_management-service-metadata
+  - name: user_management-service-connectivity
+  - name: user_management-service-logs
+  provides:
+  - name: srv-api
+    properties:
+      srv-url: ${default-url}
+  parameters:
+    memory: 256MB
+  build-parameters:
+    builder: npm
+    ignore:
+    - node_modules
+    - package-lock.json
+- name: user_management-aux-destinations
+  type: com.sap.application.content
+  requires:
+  - name: user_management-service-uaa
+    parameters:
+      service-key:
+        name: user_management-uaa-key
+  - name: srv-api
+  - name: user_management-service-html5-apps-repo-host
+    parameters:
+      service-key:
+        name: user_management-html5-apps-repo-host-key
+  - name: user_management-service-destination
+    parameters:
+      content-target: true
+  parameters:
+    content:
+      subaccount:
+        destinations:
+        - Authentication: OAuth2UserTokenExchange
+          Name: user_management-service-uaa
+          ServiceInstanceName: user_management-uaa
+          ServiceKeyName: user_management-uaa-key
+          sap.cloud.service: lcap.user_management
+        - Authentication: OAuth2UserTokenExchange
+          Name: user_management-app-srv
+          TokenServiceInstanceName: user_management-uaa
+          TokenServiceKeyName: user_management-uaa-key
+          URL: ~{srv-api/srv-url}
+          sap.cloud.service: lcap.user_management
+        - Name: user_management-service-html5-apps-repo-host
+          ServiceInstanceName: user_management-html5-apps-repo-host
+          ServiceKeyName: user_management-html5-apps-repo-host-key
+          sap.cloud.service: lcap.user_management
+        - AppgyverEnabled: true
+          Authentication: OAuth2UserTokenExchange
+          HTML5.DynamicDestination: true
+          MobileEnabled: true
+          Name: user_management-user_managementSrv
+          TokenServiceInstanceName: user_management-uaa
+          TokenServiceKeyName: user_management-uaa-key
+          URL: ~{srv-api/srv-url}/service/user_management
+          WebIDEEnabled: true
+          sap.applicationdevelopment.actions.enabled: true
+          sap.build.usage: CAP
+          sap.cloud.service: lcap.user_management
+          sap.processautomation.enabled: true
+        existing_destinations_policy: update
+  build-parameters:
+    no-source: true
+- name: user_management-launchpad
+  type: html5
+  path: build/launchpad
+  build-parameters:
+    _artifactName: launchpad.zip
+    build-result: ../../build/dist
+    builder: custom
+    commands:
+    - npm install
+    - npx -p @ui5/cli@^3.0.0 ui5 build --dest dist --include-task=generateManifestBundle
+      --include-task=generateCachebusterInfo
+    - bash -c "cd dist && npx bestzip ../../../build/dist/launchpad.zip *"
+    - rm -rf dist
+    supported-platforms: []
+- name: user_management-aux-ui-deployer
+  type: com.sap.application.content
+  path: build/ui-deployer
+  requires:
+  - name: user_management-service-html5-apps-repo-host
+    parameters:
+      content-target: true
+  build-parameters:
+    build-result: resources
+    requires:
+    - artifacts:
+      - usermanagementManageBusinessPartners.zip
+      name: user_management-usermanagement.ManageBusinessPartners
+      target-path: resources
+    - artifacts:
+      - launchpad.zip
+      name: user_management-launchpad
+      target-path: resources
+    - artifacts:
+      - appui5freestyle.zip
+      name: appui5freestyle
+      target-path: resources/
+- name: appui5freestyle
+  type: html5
+  path: app/ui5freestyle
+  build-parameters:
+    build-result: dist
+    builder: custom
+    commands:
+    - npm install
+    - npm run build:cf
+    supported-platforms: []
+resources:
+- name: user_management-service-uaa
+  type: org.cloudfoundry.managed-service
+  parameters:
+    config:
+      oauth2-configuration:
+        redirect-uris:
+        - https://*.${default-domain}/login/*
+      role-collections: []
+      xsappname: user_management-${space}
+    path: xs-security.json
+    service: xsuaa
+    service-name: user_management-uaa
+    service-plan: application
+- name: user_management-service-db
+  type: org.cloudfoundry.managed-service
+  parameters:
+    service: hana
+    service-name: user_management-db
+    service-plan: hdi-shared
+- name: user_management-service-destination
+  type: org.cloudfoundry.managed-service
+  parameters:
+    config:
+      HTML5Runtime_enabled: true
+      init_data:
+        instance:
+          destinations:
+          - Authentication: NoAuthentication
+            Name: ui5
+            ProxyType: Internet
+            Type: HTTP
+            URL: https://ui5.sap.com
+          existing_destinations_policy: update
+      version: 1.0.0
+    service: destination
+    service-name: user_management-destination
+    service-plan: lite
+- name: user_management-service-metadata
+  type: org.cloudfoundry.user-provided-service
+  parameters:
+    config:
+      default-domain: ${default-domain}
+    service: metadata
+    service-name: user_management-metadata
+    service-plan: standard
+- name: user_management-service-connectivity
+  type: org.cloudfoundry.managed-service
+  parameters:
+    service: connectivity
+    service-name: user_management-connectivity
+    service-plan: lite
+- name: user_management-service-logs
+  type: org.cloudfoundry.managed-service
+  parameters:
+    service: application-logs
+    service-name: user_management-logs
+    service-plan: lite
+- name: user_management-service-html5-apps-repo-host
+  type: org.cloudfoundry.managed-service
+  parameters:
+    service: html5-apps-repo
+    service-name: user_management-html5-apps-repo-host
+    service-plan: app-host
 parameters:
   deploy_mode: html5-repo
   enable-parallel-deployments: true
 build-parameters:
   before-all:
-    - builder: custom
-      commands:
-        - rm -rf build/dist
-        - mkdir -p build/dist
-        - rm -rf build/ui-deployer
-        - mkdir -p build/ui-deployer
-    - builder: custom
-      commands:
-        - npm install --production
-        - >-
-          bash -c "cds -v | grep 'cds-dk' || npm i --production --no-save
-          @sap/cds-dk @sap/mdk-tools"
-        - bash -c "export PATH=$PATH:$(pwd)/node_modules/.bin"
-        - cds build --production
+  - builder: custom
+    commands:
+    - rm -rf build/dist
+    - mkdir -p build/dist
+    - rm -rf build/ui-deployer
+    - mkdir -p build/ui-deployer
+  - builder: custom
+    commands:
+    - npm install --production
+    - bash -c "cds -v | grep 'cds-dk' || npm i --production --no-save @sap/cds-dk
+      @sap/mdk-tools"
+    - bash -c "export PATH=$PATH:$(pwd)/node_modules/.bin"
+    - cds build --production
   after-all:
-    - builder: custom
-      commands:
-        - npm install
-modules:
-  - name: user_management-usermanagement.ManageBusinessPartners
-    type: html5
-    path: app/user_management.ManageBusinessPartners
-    build-parameters:
-      builder: custom
-      commands:
-        - rm -rf dist-zip dist
-        - >-
-          npx -p @ui5/cli@^3.0.0 ui5 build --dest dist
-          --include-task=generateManifestBundle
-          --include-task=generateCachebusterInfo
-        - mkdir dist-zip
-        - >-
-          bash -c "cd dist && npx bestzip
-          ../dist-zip/usermanagementManageBusinessPartners.zip *"
-      _artifactName: usermanagementManageBusinessPartners.zip
-      supported-platforms: []
-      build-result: dist-zip
-  - name: user_management-db-deployer
-    type: hdb
-    path: gen/db
-    parameters:
-      buildpack: nodejs_buildpack
-    build-parameters:
-      builder: npm
-      ignore:
-        - node_modules
-        - package-lock.json
-    requires:
-      - name: user_management-service-uaa
-      - name: user_management-service-db
-  - name: user_management-srv
-    type: nodejs
-    path: gen/srv
-    parameters:
-      memory: 256MB
-    provides:
-      - name: srv-api
-        properties:
-          srv-url: ${default-url}
-    build-parameters:
-      builder: npm
-      ignore:
-        - node_modules
-        - package-lock.json
-    requires:
-      - name: user_management-service-uaa
-      - name: user_management-service-db
-      - name: user_management-service-destination
-      - name: user_management-service-metadata
-      - name: user_management-service-connectivity
-      - name: user_management-service-logs
-  - name: user_management-aux-destinations
-    type: com.sap.application.content
-    parameters:
-      content:
-        subaccount:
-          existing_destinations_policy: update
-          destinations:
-            - Authentication: OAuth2UserTokenExchange
-              Name: user_management-service-uaa
-              ServiceInstanceName: user_management-uaa
-              ServiceKeyName: user_management-uaa-key
-              sap.cloud.service: lcap.user_management
-            - Authentication: OAuth2UserTokenExchange
-              Name: user_management-app-srv
-              TokenServiceInstanceName: user_management-uaa
-              TokenServiceKeyName: user_management-uaa-key
-              URL: ~{srv-api/srv-url}
-              sap.cloud.service: lcap.user_management
-            - Name: user_management-service-html5-apps-repo-host
-              ServiceInstanceName: user_management-html5-apps-repo-host
-              ServiceKeyName: user_management-html5-apps-repo-host-key
-              sap.cloud.service: lcap.user_management
-            - Authentication: OAuth2UserTokenExchange
-              Name: user_management-user_managementSrv
-              TokenServiceInstanceName: user_management-uaa
-              TokenServiceKeyName: user_management-uaa-key
-              URL: ~{srv-api/srv-url}/service/user_management
-              sap.cloud.service: lcap.user_management
-              sap.applicationdevelopment.actions.enabled: true
-              sap.build.usage: CAP
-              sap.processautomation.enabled: true
-              HTML5.DynamicDestination: true
-              WebIDEEnabled: true
-              MobileEnabled: true
-              AppgyverEnabled: true
-    build-parameters:
-      no-source: true
-    requires:
-      - name: user_management-service-uaa
-        parameters:
-          service-key:
-            name: user_management-uaa-key
-      - name: srv-api
-      - name: user_management-service-html5-apps-repo-host
-        parameters:
-          service-key:
-            name: user_management-html5-apps-repo-host-key
-      - name: user_management-service-destination
-        parameters:
-          content-target: true
-  - name: user_management-launchpad
-    type: html5
-    path: build/launchpad
-    build-parameters:
-      builder: custom
-      commands:
-        - npm install
-        - >-
-          npx -p @ui5/cli@^3.0.0 ui5 build --dest dist
-          --include-task=generateManifestBundle
-          --include-task=generateCachebusterInfo
-        - bash -c "cd dist && npx bestzip ../../../build/dist/launchpad.zip *"
-        - rm -rf dist
-      _artifactName: launchpad.zip
-      supported-platforms: []
-      build-result: ../../build/dist
-  - name: user_management-aux-ui-deployer
-    type: com.sap.application.content
-    path: build/ui-deployer
-    build-parameters:
-      build-result: resources
-      requires:
-        - name: user_management-usermanagement.ManageBusinessPartners
-          artifacts:
-            - usermanagementManageBusinessPartners.zip
-          target-path: resources
-        - name: user_management-launchpad
-          artifacts:
-            - launchpad.zip
-          target-path: resources
-    requires:
-      - name: user_management-service-html5-apps-repo-host
-        parameters:
-          content-target: true
-resources:
-  - type: org.cloudfoundry.managed-service
-    name: user_management-service-uaa
-    parameters:
-      service: xsuaa
-      service-plan: application
-      service-name: user_management-uaa
-      path: xs-security.json
-      config:
-        oauth2-configuration:
-          redirect-uris:
-            - https://*.${default-domain}/login/*
-        xsappname: user_management-${space}
-        role-collections: []
-  - type: org.cloudfoundry.managed-service
-    name: user_management-service-db
-    parameters:
-      service: hana
-      service-plan: hdi-shared
-      service-name: user_management-db
-  - type: org.cloudfoundry.managed-service
-    name: user_management-service-destination
-    parameters:
-      service: destination
-      service-plan: lite
-      service-name: user_management-destination
-      config:
-        HTML5Runtime_enabled: true
-        version: 1.0.0
-  - type: org.cloudfoundry.user-provided-service
-    name: user_management-service-metadata
-    parameters:
-      service: metadata
-      service-plan: standard
-      service-name: user_management-metadata
-      config:
-        default-domain: ${default-domain}
-  - type: org.cloudfoundry.managed-service
-    name: user_management-service-connectivity
-    parameters:
-      service: connectivity
-      service-plan: lite
-      service-name: user_management-connectivity
-  - type: org.cloudfoundry.managed-service
-    name: user_management-service-logs
-    parameters:
-      service: application-logs
-      service-plan: lite
-      service-name: user_management-logs
-  - type: org.cloudfoundry.managed-service
-    name: user_management-service-html5-apps-repo-host
-    parameters:
-      service: html5-apps-repo
-      service-plan: app-host
-      service-name: user_management-html5-apps-repo-host
+  - builder: custom
+    commands:
+    - npm install

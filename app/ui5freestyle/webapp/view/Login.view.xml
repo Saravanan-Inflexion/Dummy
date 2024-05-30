@@ -1,0 +1,44 @@
+<mvc:View controllerName="app.ui5freestyle.controller.Login"
+    xmlns:mvc="sap.ui.core.mvc" displayBlock="true"
+    xmlns="sap.m"
+    xmlns:f="sap.f"
+    xmlns:form="sap.ui.layout.form"
+    xmlns:core="sap.ui.core"
+    xmlns:field="http://schemas.sap.com/sapui5/extension/sap.ui.core.CustomData/1" height="100%">
+    <Page id="loginPage" class="login_background" showHeader="false" backgroundDesign="Transparent" showFooter="false">
+        <content>
+            <FlexBox class="sapUiMediumMargin" justifyContent="Center" alignItems="Center" fitContainer="true" height="80%">
+                <f:Card width="90%">
+                    <f:content>
+                    <FlexBox justifyContent="Center" alignItems="Center" fitContainer="true">
+                        <VBox class="sapUiTinyMargin" justifyContent="Center" alignItems="Center" width="80%">
+                            <items>
+                                <HBox alignItems="Center" class="sapUiSmallMarginTopBottom">
+                                    <Title class="sapUiTinyMarginBegin" wrapping="true" titleStyle="H2" text="HR Service" />
+                                </HBox>
+                                <form:SimpleForm id="loginForm" class="sapUiSizeCozy" editable="false" layout="ResponsiveGridLayout" labelSpanXL="3" labelSpanL="3" labelSpanM="3" labelSpanS="12" adjustLabelSpan="false" emptySpanXL="4" emptySpanL="4" emptySpanM="4" emptySpanS="0" columnsXL="1" columnsL="1" columnsM="1" singleContainerFullSize="false">
+                                    <form:content>
+                                        <Label labelFor="inpEmail" text="Username" />
+                                        <Input id="inpEmail" value="{path : 'loginModel>/userName'}" field:type="Input" enabled="{loginModel>/enable}"/>
+                                        <Label labelFor="inpPassword" text="Password" />
+                                        <Input type="Password" id="inpPassword" value="{path : 'loginModel>/password'}" field:type="Input" enabled="{loginModel>/enable}" showValueHelp="true" valueHelpIconSrc="sap-icon://show" valueHelpRequest="onShowPassword"/>
+                                        <HBox justifyContent="End">
+                                            <Link text="Forgot Password?" press="onPressChangePassword"/>
+                                        </HBox>
+                                        <Button id="loginBtn" text="Login" type="Emphasized" class="sapUiSizeCozy" width="100%" press="onSubmit"/>
+                                    </form:content>
+                                </form:SimpleForm>
+                            </items>
+                        </VBox>
+                         </FlexBox>
+                    </f:content>
+                </f:Card>
+            </FlexBox>
+        </content>
+        <footer>
+            <OverflowToolbar>
+                <Button id="messagePopoverBtnLogin" visible="{=!!${errors>/}.length}" icon="sap-icon://error" type="Negative" text="Error" press=".handleMessagePopoverPress" ariaHasPopup="Dialog" />
+            </OverflowToolbar>
+        </footer>
+    </Page>
+</mvc:View>

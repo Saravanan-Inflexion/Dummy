@@ -1,0 +1,19 @@
+<mvc:View
+    controllerName="ui5freestyleapp.controller.Login"
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns="sap.m"
+    displayBlock="true">
+    <Page title="Login">
+        <content>
+            <FlexBox alignItems="Center" justifyContent="Center" fitContainer="true">
+                <VBox>
+                    <Label text="Username" />
+                    <Input id="username" />
+                    <Label text="Password" />
+                    <Input id="password" type="Password" />
+                    <Button text="Login" press="onLogin" />
+                </VBox>
+            </FlexBox>
+        </content>
+    </Page>
+</mvc:View>
